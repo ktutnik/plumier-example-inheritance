@@ -51,8 +51,10 @@ export class User {
 @generic.template("T")
 export class ControllerBase<T> {
     private readonly repo: Repository<T>
-    constructor(entity: Class) {
-        this.repo = getManager().getRepository(entity)
+    constructor() {
+        const meta = tin(this.constructor as Class)
+        const genericDecorator = meta.decorators.find(x => x.kind == "GenericType")
+        this.repo = getManager().getRepository(genericDecorator.types[0])
     }
 
     @route.get("")
@@ -82,14 +84,10 @@ export class ControllerBase<T> {
 // --------------------------------------------------------------------- //
 
 @generic.type(User)
-export class UserController extends ControllerBase<User> {
-    constructor() { super(User) }
-}
+export class UserController extends ControllerBase<User> { }
 
 @generic.type(Todo)
-export class TodoController extends ControllerBase<Todo> {
-    constructor() { super(Todo) }
-}
+export class TodoController extends ControllerBase<Todo> { }
 
 
 // --------------------------------------------------------------------- //
