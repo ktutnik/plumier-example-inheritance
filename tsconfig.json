@@ -8,5 +8,6 @@
     //optional
     "strict": true,
     "esModuleInterop": true,
+    "strictPropertyInitialization": false
   }
 }

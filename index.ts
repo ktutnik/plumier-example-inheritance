@@ -1,111 +1,126 @@
-import Plumier, { route, domain, val, WebApiFacility } from "plumier";
-import knex from "knex"
+import { Context } from "koa"
+import Plumier, { bind, Class, DefaultFacility, route, val, WebApiFacility } from "plumier"
+import tin, { generic, noop } from "tinspector"
+import * as tslib from "tslib"
+import {
+    Column,
+    createConnection,
+    Entity,
+    getManager,
+    getMetadataArgsStorage,
+    PrimaryGeneratedColumn,
+    Repository,
+} from "typeorm"
 
-// ##################################################################### //
-// ############################## DATABASE ############################# //
-// ##################################################################### //
+// --------------------------------------------------------------------- //
+// ------------------------------ ENTITIES ----------------------------- //
+// --------------------------------------------------------------------- //
 
-const db = knex({
-    client: "mysql2",
-    connection: "mysql://root:password@localhost/todo"
-})
+@Entity()
+export class Todo {
+    @PrimaryGeneratedColumn()
+    id: number
 
-// ##################################################################### //
-// ############################## DOMAINS ############################## //
-// ##################################################################### //
-
-@domain()
-export class Domain {
-    constructor(
-        @val.optional()
-        public id: number = 0,
-        @val.optional()
-        public createdAt: Date = new Date(),
-        @val.optional()
-        public deleted: boolean = false
-    ) { }
+    @Column()
+    todo: string
 }
 
-@domain()
-export class Todo extends Domain {
-    constructor(
-        public note: string
-    ) { super() }
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column()
+    @val.email()
+    email: string
+
+    @Column()
+    name: string
+
+    @Column()
+    password: string
+
+    @Column()
+    role: "User" | "Admin"
 }
 
-@domain()
-export class User extends Domain {
-    constructor(
-        @val.email()
-        public email: string,
-        public name: string,
-        public password: string,
-        public role: "User" | "Admin"
-    ) { super() }
-}
+// --------------------------------------------------------------------- //
+// -------------------------- BASE CONTROLLER -------------------------- //
+// --------------------------------------------------------------------- //
 
-// ##################################################################### //
-// ############################ CONTROLLERS ############################ //
-// ##################################################################### //
-
-export class ControllerBase {
-    constructor(private readonly tableName: string) { }
+@generic.template("T")
+export class ControllerBase<T> {
+    private readonly repo: Repository<T>
+    constructor(entity: Class) {
+        this.repo = getManager().getRepository(entity)
+    }
 
     @route.get("")
-    list() {
-        return db(this.tableName).where({ deleted: 0 })
+    @tin.type(["T"])
+    list(): Promise<T[]> {
+        return this.repo.find()
     }
 
     @route.post("")
-    save(data: Domain) {
-        return db(this.tableName).insert(data)
+    save(@tin.type("T") data: T) {
+        return this.repo.save(data)
     }
 
     @route.put(":id")
-    modify(id: number, data: Domain) {
-        return db(this.tableName).update(data).where({ id })
+    modify(id: number, @tin.type("T") data: T) {
+        return this.repo.update(id, data)
     }
 
     @route.delete(":id")
     delete(id: number) {
-        return db(this.tableName).delete().where({ id })
+        return this.repo.delete(id)
     }
 }
 
-export class TodoController extends ControllerBase {
-    constructor() { super("Todo") }
+// --------------------------------------------------------------------- //
+// ---------------------------- CONTROLLERS ---------------------------- //
+// --------------------------------------------------------------------- //
 
-    @route.post("")
-    save(data: Todo) {
-        return super.save(data)
-    }
-
-    @route.put(":id")
-    modify(id: number, data: Todo) {
-        return super.modify(id, data)
-    }
+@generic.type(User)
+export class UserController extends ControllerBase<User> {
+    constructor() { super(User) }
 }
 
-export class UserController extends ControllerBase {
-    constructor() { super("User") }
-
-    @route.post("")
-    save(data: User) {
-        return super.save(data)
-    }
-
-    @route.put(":id")
-    modify(id: number, data: User) {
-        return super.modify(id, data)
-    }
+@generic.type(Todo)
+export class TodoController extends ControllerBase<Todo> {
+    constructor() { super(Todo) }
 }
 
-// ##################################################################### //
-// ############################# BOOTSTRAP ############################# //
-// ##################################################################### //
+
+// --------------------------------------------------------------------- //
+// ------------------------------ FACILITY ----------------------------- //
+// --------------------------------------------------------------------- //
+
+// this facility may be provided by Plumier @plumier/typeorm
+class TypeOrmFacility extends DefaultFacility {
+    setup(){
+        const columns = getMetadataArgsStorage().columns;
+        for (const col of columns) {
+            tslib.__decorate([noop()], (col.target as Function).prototype, col.propertyName, void 0)
+        }
+    }
+
+    async initialize() {
+        await createConnection({
+            "type": "mysql",
+            "host": "localhost",
+            "port": 3306,
+            "username": "root",
+            "password": "password",
+            "database": "todo",
+            "entities": [
+                __filename
+            ]
+        })
+    }
+}
 
 new Plumier()
     .set(new WebApiFacility({ controller: __filename }))
-    .initialize()
-    .then(koa => koa.listen(8000))
-    .catch(e => console.log(e))
+    .set(new TypeOrmFacility())
+    .listen(8000)

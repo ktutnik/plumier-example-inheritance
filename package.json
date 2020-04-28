@@ -6,20 +6,20 @@
     "test": "jest"
   },
   "dependencies": {
-    "@types/dotenv": "^6.1.0",
-    "@types/knex": "^0.15.2",
-    "dotenv": "^6.2.0",
-    "knex": "^0.16.3",
-    "mysql2": "^1.6.5",
-    "plumier": "^1.0.0-beta.2"
+    "@types/dotenv": "^8.2.0",
+    "@types/knex": "^0.16.1",
+    "dotenv": "^8.2.0",
+    "mysql2": "^2.1.0",
+    "plumier": "1.0.0-canary1587988578.7",
+    "typeorm": "^0.2.24"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.7",
-    "@types/supertest": "^2.0.7",
-    "jest": "^24.1.0",
-    "supertest": "^3.4.2",
-    "ts-jest": "^24.0.0",
-    "ts-node-dev": "^1.0.0-pre.32",
-    "typescript": "^3.3.3333"
+    "@types/jest": "^25.2.1",
+    "@types/supertest": "^2.0.8",
+    "jest": "^25.4.0",
+    "supertest": "^4.0.2",
+    "ts-jest": "^25.4.0",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.8.3"
   }
 }
