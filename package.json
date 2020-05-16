@@ -10,7 +10,9 @@
     "@types/knex": "^0.16.1",
     "dotenv": "^8.2.0",
     "mysql2": "^2.1.0",
-    "plumier": "1.0.0-canary1587988578.7",
+    "plumier": "1.0.0-canary1589614058.29",
+    "@plumier/swagger": "1.0.0-canary1589614058.29",
+    "@plumier/typeorm": "1.0.0-canary1589614058.29",
     "typeorm": "^0.2.24"
   },
   "devDependencies": {

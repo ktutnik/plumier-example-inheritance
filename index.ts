@@ -1,16 +1,8 @@
-import { Context } from "koa"
-import Plumier, { bind, Class, DefaultFacility, route, val, WebApiFacility } from "plumier"
-import tin, { generic, noop } from "tinspector"
-import * as tslib from "tslib"
-import {
-    Column,
-    createConnection,
-    Entity,
-    getManager,
-    getMetadataArgsStorage,
-    PrimaryGeneratedColumn,
-    Repository,
-} from "typeorm"
+import { SwaggerFacility } from "@plumier/swagger"
+import { TypeORMFacility } from "@plumier/typeorm"
+import Plumier, { Class, route, val, WebApiFacility, LoggerFacility } from "plumier"
+import reflect, { generic, type } from "tinspector"
+import { Column, Entity, getManager, PrimaryGeneratedColumn, Repository } from "typeorm"
 
 // --------------------------------------------------------------------- //
 // ------------------------------ ENTITIES ----------------------------- //
@@ -52,24 +44,25 @@ export class User {
 export class ControllerBase<T> {
     private readonly repo: Repository<T>
     constructor() {
-        const meta = tin(this.constructor as Class)
+        const meta = reflect(this.constructor as Class)
         const genericDecorator = meta.decorators.find(x => x.kind == "GenericType")
         this.repo = getManager().getRepository(genericDecorator.types[0])
     }
 
     @route.get("")
-    @tin.type(["T"])
+    @reflect.type(["T"])
     list(): Promise<T[]> {
         return this.repo.find()
     }
 
     @route.post("")
-    save(@tin.type("T") data: T) {
+    save(@reflect.type("T") data: T) {
         return this.repo.save(data)
     }
 
     @route.put(":id")
-    modify(id: number, @tin.type("T") data: T) {
+    @route.patch(":id")
+    modify(id: number, @reflect.type("T") data: T) {
         return this.repo.update(id, data)
     }
 
@@ -94,31 +87,19 @@ export class TodoController extends ControllerBase<Todo> { }
 // ------------------------------ FACILITY ----------------------------- //
 // --------------------------------------------------------------------- //
 
-// this facility may be provided by Plumier @plumier/typeorm
-class TypeOrmFacility extends DefaultFacility {
-    setup(){
-        const columns = getMetadataArgsStorage().columns;
-        for (const col of columns) {
-            tslib.__decorate([noop()], (col.target as Function).prototype, col.propertyName, void 0)
-        }
-    }
-
-    async initialize() {
-        await createConnection({
-            "type": "mysql",
-            "host": "localhost",
-            "port": 3306,
-            "username": "root",
-            "password": "password",
-            "database": "todo",
-            "entities": [
-                __filename
-            ]
-        })
-    }
-}
-
 new Plumier()
     .set(new WebApiFacility({ controller: __filename }))
-    .set(new TypeOrmFacility())
+    .set(new LoggerFacility())
+    .set(new SwaggerFacility())
+    .set(new TypeORMFacility({
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "password",
+        "database": "todo",
+        "entities": [
+            __filename
+        ]
+    }))
     .listen(8000)
