@@ -34,7 +34,6 @@ export class User {
     todos: Todo[]
 }
 
-@route.ignore()
 @Entity()
 export class Todo {
     @PrimaryGeneratedColumn("uuid")
