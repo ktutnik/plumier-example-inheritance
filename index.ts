@@ -1,21 +1,14 @@
+import { JwtAuthFacility } from "@plumier/jwt"
 import { SwaggerFacility } from "@plumier/swagger"
-import { TypeORMFacility } from "@plumier/typeorm"
-import Plumier, { Class, route, val, WebApiFacility, LoggerFacility } from "plumier"
-import reflect, { generic, type } from "tinspector"
-import { Column, Entity, getManager, PrimaryGeneratedColumn, Repository } from "typeorm"
+import { CRUDTypeORMFacility } from "@plumier/typeorm"
+import { sign } from "jsonwebtoken"
+import Plumier, { authorize, LoggerFacility, val, WebApiFacility, route } from "plumier"
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 
 // --------------------------------------------------------------------- //
 // ------------------------------ ENTITIES ----------------------------- //
 // --------------------------------------------------------------------- //
 
-@Entity()
-export class Todo {
-    @PrimaryGeneratedColumn()
-    id: number
-
-    @Column()
-    todo: string
-}
 
 @Entity()
 export class User {
@@ -29,77 +22,53 @@ export class User {
     @Column()
     name: string
 
+    @authorize.role("Admin")
     @Column()
     password: string
 
+    @authorize.role("Admin")
     @Column()
     role: "User" | "Admin"
+
+    @OneToMany(x => Todo, x => x.user)
+    todos: Todo[]
 }
 
-// --------------------------------------------------------------------- //
-// -------------------------- BASE CONTROLLER -------------------------- //
-// --------------------------------------------------------------------- //
+@route.ignore()
+@Entity()
+export class Todo {
+    @PrimaryGeneratedColumn("uuid")
+    id: string
 
-@generic.template("T")
-export class ControllerBase<T> {
-    private readonly repo: Repository<T>
-    constructor() {
-        const meta = reflect(this.constructor as Class)
-        const genericDecorator = meta.decorators.find(x => x.kind == "GenericType")
-        this.repo = getManager().getRepository(genericDecorator.types[0])
-    }
+    @Column()
+    todo: string
 
-    @route.get("")
-    @reflect.type(["T"])
-    list(): Promise<T[]> {
-        return this.repo.find()
-    }
-
-    @route.post("")
-    save(@reflect.type("T") data: T) {
-        return this.repo.save(data)
-    }
-
-    @route.put(":id")
-    @route.patch(":id")
-    modify(id: number, @reflect.type("T") data: T) {
-        return this.repo.update(id, data)
-    }
-
-    @route.delete(":id")
-    delete(id: number) {
-        return this.repo.delete(id)
-    }
+    @ManyToOne(x => User, x => x.todos)
+    user: User
 }
-
-// --------------------------------------------------------------------- //
-// ---------------------------- CONTROLLERS ---------------------------- //
-// --------------------------------------------------------------------- //
-
-@generic.type(User)
-export class UserController extends ControllerBase<User> { }
-
-@generic.type(Todo)
-export class TodoController extends ControllerBase<Todo> { }
-
 
 // --------------------------------------------------------------------- //
 // ------------------------------ FACILITY ----------------------------- //
 // --------------------------------------------------------------------- //
 
 new Plumier()
-    .set(new WebApiFacility({ controller: __filename }))
+    .set(new WebApiFacility())
     .set(new LoggerFacility())
+    .set(new JwtAuthFacility({ secret: "lorem" }))
     .set(new SwaggerFacility())
-    .set(new TypeORMFacility({
-        "type": "mysql",
-        "host": "localhost",
-        "port": 3306,
-        "username": "root",
-        "password": "password",
-        "database": "todo",
-        "entities": [
-            __filename
-        ]
+    .set(new CRUDTypeORMFacility({
+        rootPath: "/api/v1/",
+        connection: {
+            type: "sqlite",
+            database: ":memory:",
+            dropSchema: true,
+            entities: [__filename],
+            synchronize: true,
+            logging: false
+        }
     }))
     .listen(8000)
+
+
+console.log("Admin", sign({ role: "Admin" }, "lorem"))
+console.log("User", sign({ role: "User" }, "lorem"))
