@@ -2,7 +2,7 @@
   "name": "starter",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node-dev --inspect -- index",
+    "start": "ts-node-dev --inspect --no-deps -- index",
     "test": "jest"
   },
   "dependencies": {
@@ -11,10 +11,10 @@
     "@types/jsonwebtoken":"^8.5.0",
     "dotenv": "^8.2.0",
     "sqlite3": "^4.2.0",
-    "plumier": "1.0.0-canary1591405562.62",
-    "@plumier/swagger": "1.0.0-canary1591405562.62",
-    "@plumier/typeorm": "1.0.0-canary1591405562.62",
-    "@plumier/jwt": "1.0.0-canary1591405562.62",
+    "plumier": "1.0.0-canary.kc1pwqwc.0",
+    "@plumier/swagger": "1.0.0-canary.kc1pwqwc.0",
+    "@plumier/typeorm": "1.0.0-canary.kc1pwqwc.0",
+    "@plumier/jwt": "1.0.0-canary.kc1pwqwc.0",
     "jsonwebtoken": "^8.5.1",
     "typeorm": "^0.2.24"
   },

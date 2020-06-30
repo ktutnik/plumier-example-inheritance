@@ -1,8 +1,8 @@
 import { JwtAuthFacility } from "@plumier/jwt"
 import { SwaggerFacility } from "@plumier/swagger"
-import { CRUDTypeORMFacility } from "@plumier/typeorm"
+import { TypeORMFacility, TypeORMGenericControllerFacility } from "@plumier/typeorm"
 import { sign } from "jsonwebtoken"
-import Plumier, { authorize, LoggerFacility, val, WebApiFacility, route } from "plumier"
+import Plumier, { authorize, LoggerFacility, val, WebApiFacility, route, api } from "plumier"
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 
 // --------------------------------------------------------------------- //
@@ -22,12 +22,12 @@ export class User {
     @Column()
     name: string
 
-    @authorize.role("Admin")
+    @authorize.get("Admin")
     @Column()
     password: string
 
     @authorize.role("Admin")
-    @Column()
+    @Column({ nullable: true })
     role: "User" | "Admin"
 
     @OneToMany(x => Todo, x => x.user)
@@ -35,8 +35,9 @@ export class User {
 }
 
 @Entity()
+@route.ignore()
 export class Todo {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryGeneratedColumn()
     id: string
 
     @Column()
@@ -46,26 +47,33 @@ export class Todo {
     user: User
 }
 
+
+@route.root("api/v1/users")
+export class UsersController {
+    @route.post("")
+    save(data:User){}
+}
+
 // --------------------------------------------------------------------- //
 // ------------------------------ FACILITY ----------------------------- //
 // --------------------------------------------------------------------- //
 
 new Plumier()
-    .set(new WebApiFacility())
+    .set(new WebApiFacility({controller: __filename}))
     .set(new LoggerFacility())
     .set(new JwtAuthFacility({ secret: "lorem" }))
     .set(new SwaggerFacility())
-    .set(new CRUDTypeORMFacility({
-        rootPath: "/api/v1/",
+    .set(new TypeORMFacility({
         connection: {
             type: "sqlite",
             database: ":memory:",
-            dropSchema: true,
+            //dropSchema: true,
             entities: [__filename],
             synchronize: true,
             logging: false
         }
     }))
+    .set(new TypeORMGenericControllerFacility())
     .listen(8000)
 
 
