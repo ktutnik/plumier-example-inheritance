@@ -1,29 +1,23 @@
 {
-  "name": "starter",
+  "name": "plumier-get-started",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node-dev --inspect --no-deps -- index",
-    "test": "jest"
+    "start": "ts-node-dev --inspect --no-deps -- src/index"
   },
   "dependencies": {
-    "@types/dotenv": "^8.2.0",
-    "@types/knex": "^0.16.1",
     "@types/jsonwebtoken":"^8.5.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@plumier/jwt": "1.0.0-canary.kdkqxkys.0",
+    "@plumier/swagger": "1.0.0-canary.kdkqxkys.0",
+    "@plumier/typeorm": "1.0.0-canary.kdkqxkys.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "sqlite3": "^4.2.0",
-    "plumier": "1.0.0-canary.kdjj7hrf.0",
-    "@plumier/swagger": "1.0.0-canary.kdjj7hrf.0",
-    "@plumier/typeorm": "1.0.0-canary.kdjj7hrf.0",
-    "@plumier/jwt": "1.0.0-canary.kdjj7hrf.0",
+    "plumier": "1.0.0-canary.kdkqxkys.0",
     "jsonwebtoken": "^8.5.1",
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.1",
-    "@types/supertest": "^2.0.8",
-    "jest": "^25.4.0",
-    "supertest": "^4.0.2",
-    "ts-jest": "^25.4.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.8.3"
   }
