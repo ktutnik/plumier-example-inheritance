@@ -3,7 +3,7 @@ import { authorize, val } from "plumier"
 import { BeforeInsert, Column, Entity, OneToMany } from "typeorm"
 
 import { EntityBase } from "../_shared/entity"
-import { Log } from "../log/log.entity"
+import { Todo } from "../todo/todo.entity"
 import { ownerOnly } from "./user-filter"
 
 @authorize.public({ action: "save" }) // set the save method (POST /users/:id) as public
@@ -34,6 +34,6 @@ export class User extends EntityBase{
         this.password = await hash(this.password, salt)
     }
 
-    @OneToMany(x => Log, x => x.user)
-    logs:Log[]
+    @OneToMany(x => Todo, x => x.user)
+    todos:Todo[]
 }

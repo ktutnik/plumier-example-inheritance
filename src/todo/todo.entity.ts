@@ -3,18 +3,12 @@ import { User } from "../user/user-entity"
 import { EntityBase } from "../_shared/entity"
 import { route } from "plumier"
 
-@route.ignore()
+@route.ignore() // Log will not generated into routes
 @Entity()
-export class Log extends EntityBase {
-    @PrimaryGeneratedColumn()
-    id:number
-
+export class Todo extends EntityBase {
     @Column()
-    log:string
+    todo:string
 
-    @CreateDateColumn()
-    createdAt:Date
-
-    @ManyToOne(x => User, x => x.logs)
+    @ManyToOne(x => User, x => x.todos)
     user:User
 }
