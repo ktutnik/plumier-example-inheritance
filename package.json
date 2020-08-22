@@ -7,13 +7,13 @@
   "dependencies": {
     "@types/jsonwebtoken":"^8.5.0",
     "@types/bcryptjs": "^2.4.2",
-    "@plumier/jwt": "1.0.0-canary.kdkqxkys.0",
-    "@plumier/swagger": "1.0.0-canary.kdkqxkys.0",
-    "@plumier/typeorm": "1.0.0-canary.kdkqxkys.0",
+    "@plumier/jwt": "1.0.0-canary.kdvw2za0.0",
+    "@plumier/swagger": "1.0.0-canary.kdvw2za0.0",
+    "@plumier/typeorm": "1.0.0-canary.kdvw2za0.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "sqlite3": "^4.2.0",
-    "plumier": "1.0.0-canary.kdkqxkys.0",
+    "plumier": "1.0.0-canary.kdvw2za0.0",
     "jsonwebtoken": "^8.5.1",
     "typeorm": "^0.2.24"
   },
