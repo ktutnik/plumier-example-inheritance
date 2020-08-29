@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from "typeorm"
-import { User } from "../user/user-entity"
-import { EntityBase } from "../_shared/entity"
 import { route } from "plumier"
+import { Column, Entity, ManyToOne } from "typeorm"
 
-@route.ignore() // Log will not generated into routes
+import { EntityBase } from "../_shared/entity"
+import { User } from "../user/user-entity"
+
+@route.controller()
 @Entity()
 export class Todo extends EntityBase {
     @Column()

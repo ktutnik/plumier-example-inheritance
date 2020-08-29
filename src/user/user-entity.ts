@@ -1,31 +1,31 @@
 import { genSalt, hash } from "bcryptjs"
-import { authorize, val } from "plumier"
+import { authorize, val, route } from "plumier"
 import { BeforeInsert, Column, Entity, OneToMany } from "typeorm"
 
 import { EntityBase } from "../_shared/entity"
 import { Todo } from "../todo/todo.entity"
 import { ownerOnly } from "./user-filter"
 
-@authorize.public({ action: "save" }) // set the save method (POST /users/:id) as public
+@route.controller()
+@authorize.public({ action: "save" }) 
 @Entity()
 export class User extends EntityBase{
     
-    @Column()
+    @authorize.custom(ownerOnly, { access: "get" }) 
     @val.email()
-    @authorize.custom(ownerOnly, { access: "get" }) // email only visible by owner
+    @Column()
     email: string
 
     @Column()
     name: string
 
-    @Column()
     @authorize.writeonly()
+    @Column()
     password: string
 
+    @authorize.custom(ownerOnly, { access: "get" }) 
+    @authorize.role("Admin")
     @Column({ default: "User" })
-    // role only visible by owner and Admin, but can be set only by Admin
-    @authorize.custom(ownerOnly, { access: "get" }) // -> get access by Owner
-    @authorize.role("Admin") // --> get/set access by Admin
     role: "User" | "Admin"
 
     @BeforeInsert()
@@ -34,6 +34,7 @@ export class User extends EntityBase{
         this.password = await hash(this.password, salt)
     }
 
+    @route.controller()
     @OneToMany(x => Todo, x => x.user)
     todos:Todo[]
 }
