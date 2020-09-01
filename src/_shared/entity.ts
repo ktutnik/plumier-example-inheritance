@@ -1,10 +1,10 @@
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column } from "typeorm";
 import { authorize } from "plumier";
 
 
 
 export interface LoginUser {
-    userId:number,
+    userId: number,
     role: "User" | "Admin"
 }
 
@@ -15,9 +15,13 @@ export class EntityBase {
 
     @authorize.readonly()
     @CreateDateColumn()
-    createdAt:Date
+    createdAt: Date
 
     @authorize.readonly()
     @UpdateDateColumn()
-    updatedAt:Date
+    updatedAt: Date
+
+    @authorize.readonly()
+    @Column({ default: false })
+    deleted: boolean
 }

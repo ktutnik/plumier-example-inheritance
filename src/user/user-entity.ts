@@ -7,11 +7,11 @@ import { Todo } from "../todo/todo.entity"
 import { ownerOnly } from "./user-filter"
 
 @route.controller()
-@authorize.public({ action: "save" }) 
+@authorize.public({ applyTo: "save" }) 
 @Entity()
 export class User extends EntityBase{
     
-    @authorize.custom(ownerOnly, { access: "get" }) 
+    @authorize.custom(ownerOnly, { access: "read" }) 
     @val.email()
     @Column()
     email: string
@@ -23,8 +23,7 @@ export class User extends EntityBase{
     @Column()
     password: string
 
-    @authorize.custom(ownerOnly, { access: "get" }) 
-    @authorize.role("Admin")
+    @authorize.custom(ownerOnly, { access: "read" }) 
     @Column({ default: "User" })
     role: "User" | "Admin"
 
