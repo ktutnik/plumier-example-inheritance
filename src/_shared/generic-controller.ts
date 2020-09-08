@@ -14,6 +14,7 @@ export class CustomRepository<T> extends TypeORMRepository<T> {
     }
 }
 
+
 export class CustomOneToManyRepository<P, T> extends TypeORMOneToManyRepository<P, T>{
     delete(id: any) {
         // override the default delete method

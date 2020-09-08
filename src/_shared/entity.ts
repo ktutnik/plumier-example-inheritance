@@ -5,7 +5,7 @@ import { authorize } from "plumier";
 
 export interface LoginUser {
     userId: number,
-    role: "User" | "Admin"
+    role: "User" | "Admin" | "RefreshToken"
 }
 
 export class EntityBase {
