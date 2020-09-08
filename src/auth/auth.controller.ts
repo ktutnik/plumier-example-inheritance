@@ -25,6 +25,7 @@ export class AuthController {
         return this.createTokens(user)
     }
 
+    @route.post()
     @authorize.role("RefreshToken")
     async refresh(@bind.user() user:LoginUser) {
         const saved = await this.userRepo.findOne(user.userId)
