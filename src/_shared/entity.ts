@@ -1,13 +1,12 @@
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column } from "typeorm";
-import { authorize } from "plumier";
-
-
+import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Column, Entity } from "typeorm";
+import { authorize, entity } from "plumier";
 
 export interface LoginUser {
     userId: number,
     role: "User" | "Admin" | "RefreshToken"
 }
 
+@Entity()
 export class EntityBase {
     @authorize.readonly()
     @PrimaryGeneratedColumn()
@@ -21,6 +20,7 @@ export class EntityBase {
     @UpdateDateColumn()
     updatedAt: Date
 
+    @entity.deleteColumn()
     @authorize.readonly()
     @Column({ default: false })
     deleted: boolean

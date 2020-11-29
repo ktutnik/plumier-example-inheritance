@@ -14,7 +14,7 @@ new Plumier()
     .set(new LoggerFacility())
     .set(new JwtAuthFacility({
         secret: process.env.PLUM_JWT_SECRET!,
-        global: mergeDecorator(authorize.role('Admin'), authorize.role('User'))
+        global: mergeDecorator(authorize.route('Admin'), authorize.route('User'))
     }))
     .set(new SwaggerFacility())
     .set(new TypeORMFacility())

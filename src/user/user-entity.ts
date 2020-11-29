@@ -1,17 +1,17 @@
 import { genSalt, hash } from "bcryptjs"
-import { authorize, val, route } from "plumier"
+import { authorize, val, route, Public } from "plumier"
 import { BeforeInsert, Column, Entity, OneToMany } from "typeorm"
 
 import { EntityBase } from "../_shared/entity"
 import { Todo } from "../todo/todo.entity"
-import { ownerOnly } from "./user-filter"
 
-@route.controller()
-@authorize.public({ applyTo: "save" }) 
+@route.controller(c => {
+    c.post().authorize(Public)
+    c.getMany().authorize(Public)
+})
 @Entity()
-export class User extends EntityBase{
-    
-    @authorize.custom(ownerOnly, { access: "read" }) 
+export class User extends EntityBase {
+
     @val.email()
     @Column()
     email: string
@@ -23,7 +23,6 @@ export class User extends EntityBase{
     @Column()
     password: string
 
-    @authorize.custom(ownerOnly, { access: "read" }) 
     @Column({ default: "User" })
     role: "User" | "Admin"
 
@@ -35,5 +34,5 @@ export class User extends EntityBase{
 
     @route.controller()
     @OneToMany(x => Todo, x => x.user)
-    todos:Todo[]
+    todos: Todo[]
 }

@@ -26,7 +26,7 @@ export class AuthController {
     }
 
     @route.post()
-    @authorize.role("RefreshToken")
+    @authorize.route("RefreshToken")
     async refresh(@bind.user() user:LoginUser) {
         const saved = await this.userRepo.findOne(user.userId)
         if(!saved) throw new HttpStatusError(404, "User not found")
